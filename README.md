@@ -1,2 +1,2 @@
 # FlappyBirdInJava
-A game powered by Java which is copy-cat of mobile game 'Flappy Bird'
+Java desktop game that imitates "Flappy Bird"
