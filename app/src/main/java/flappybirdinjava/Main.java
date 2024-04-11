@@ -16,4 +16,14 @@ public class Main {
     public static Frame getFrame() {
         return frame;
     }
+
+    public static int clamp(int number, int min, int max) {
+        if (number < min) {
+            return min;
+        }
+        else if (number > max) {
+            return max;
+        }
+        return number;
+    }
 }

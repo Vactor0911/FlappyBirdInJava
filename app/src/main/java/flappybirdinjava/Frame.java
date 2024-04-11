@@ -3,9 +3,13 @@ package flappybirdinjava;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Frame extends JFrame {
-    BackgroundPanel pnlBackground = new BackgroundPanel();
+    private BackgroundPanel pnlBackground = new BackgroundPanel();
+    private Timer timer = new Timer();
+    private TimerTask timerTask;
 
     //Variable
     private float sizeMultiply = 1.0f;
@@ -19,10 +23,22 @@ public class Frame extends JFrame {
         setMinimumSize( new Dimension(256, 256) );
         
         add(pnlBackground);
+
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                pnlBackground.update();
+            }
+        };
+        timer.scheduleAtFixedRate(timerTask, 0, 10);
     }
 
     public float getSizeMultiply() {
         return sizeMultiply;
+    }
+
+    public BackgroundPanel getBackgroundPanel() {
+        return pnlBackground;
     }
 
     @Override
