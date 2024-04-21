@@ -17,6 +17,10 @@ public class Main {
         return frame;
     }
 
+    public static float getSizeMultiply() {
+        return frame.getSizeMultiply();
+    }
+
     public static int clamp(int number, int min, int max) {
         if (number < min) {
             return min;

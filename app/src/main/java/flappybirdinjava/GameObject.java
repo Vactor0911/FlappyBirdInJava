@@ -4,21 +4,27 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public abstract class GameObject extends JPanel {
-    abstract void update();
+public abstract class GameObject extends JLabel {
+    public GameObject() {
+        super();
+        setOpaque(false);
+    }
+
+    public abstract void update();
 }
 
 class BackgroundPanel extends JPanel {
     private Image imgBackground = new ImageIcon( Main.getPath("/sprites/background.png") ).getImage();
-    private final int WIDTH = imgBackground.getWidth(this);
-    private final int HEIGHT = imgBackground.getHeight(this);
+    private final int WIDTH = imgBackground.getWidth(null);
+    private final int HEIGHT = imgBackground.getHeight(null);
+
     private Bird bird = new Bird();
 
     public BackgroundPanel() {
-        setLayout(null);
+        this.setLayout(null);
 
         bird.setLocation(100, 100);
-        bird.setSize( bird.getWidth(), bird.getHeight() );
+        bird.setSize(100, 100);
         add(bird);
 
         addMouseListener( new MyMouseListener() );
@@ -33,7 +39,7 @@ class BackgroundPanel extends JPanel {
         super.paintComponent(g);
 
         Frame frame = Main.getFrame();
-        float sizeMultiply = frame.getSizeMultiply();
+        float sizeMultiply = Main.getFrame().getSizeMultiply();
         int fixedWidth = (int)(WIDTH * sizeMultiply);
         int fixedHeight = (int)(HEIGHT * sizeMultiply);
 
@@ -45,49 +51,48 @@ class BackgroundPanel extends JPanel {
     private class MyMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
-            bird.setJumpPower(-10);
+            bird.jump();
         }
     }
 }
 
 
 class Bird extends GameObject {
-    private Image imgBird = new ImageIcon( Main.getPath("/sprites/bird_midflap.png") ).getImage();
-    private final int WIDTH = imgBird.getWidth(this);
-    private final int HEIGHT = imgBird.getHeight(this);
-    private int jumpPower = -1;
-    private final int MAX_JUMP_POWER = 2;
-    private int y = getY();
+    private final ImageIcon image = new ImageIcon( Main.getPath("/sprites/bird_midflap.png") );
+    private final int WIDTH = image.getImage().getWidth(null);
+    private final int HEIGHT = image.getImage().getHeight(null);
+
+    private float jump = 0f;
+    private final float GRAVITY = 3f;
+    private final float G_FORCE = 0.5f;
+
+    public Bird() {
+        setOpaque(false);
+    }
 
     public void update() {
-        y = Main.clamp( y + jumpPower, getHeight(), Main.getFrame().getBackgroundPanel().getHeight() );
-        setLocation( 100, y - getHeight() );
-
-        if (jumpPower < MAX_JUMP_POWER) {
-            jumpPower += 1;
+        if ( jump > -GRAVITY) {
+            jump -= G_FORCE;
         }
+        else{
+            jump = -GRAVITY;
+        }
+
+        float sizeMultiply = Main.getSizeMultiply();
+
+        setSize( (int)(WIDTH * sizeMultiply), (int)(HEIGHT * sizeMultiply) );
+
+        int y = Main.clamp( getY() - (int)( jump * Main.getSizeMultiply() ), 0, Main.getFrame().getBackgroundPanel().getHeight() - this.getHeight() );
+        setLocation( (int)(100 * Main.getSizeMultiply() ), y);
     }
 
-    public int getWidth() {
-        return WIDTH;
-    }
-    public int getHeight() {
-        return HEIGHT;
+    public void jump() {
+        jump = 10;
     }
 
-    public void setJumpPower(int jumpPower) {
-        this.jumpPower = jumpPower;
-    }
-
-    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
-        Frame frame = Main.getFrame();
-        float sizeMultiply = frame.getSizeMultiply();
-        int fixedWidth = (int)(WIDTH * sizeMultiply);
-        int fixedHeight = (int)(HEIGHT * sizeMultiply);
-        g.drawImage(imgBird, 0, 0, fixedWidth, fixedHeight, this);
-        setSize(fixedWidth, fixedHeight);
+        
+        g.drawImage(image.getImage(), 0, 0, getWidth(), getHeight(), this);
     }
 }
