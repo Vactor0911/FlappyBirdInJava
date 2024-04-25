@@ -55,14 +55,11 @@ class BackgroundPanel extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Frame frame = Main.getFrame();
         float sizeMultiply = Main.getFrame().getSizeMultiply();
         int fixedWidth = (int)(WIDTH * sizeMultiply);
         int fixedHeight = (int)(HEIGHT * sizeMultiply);
 
-        for (int i=0; i<frame.getWidth() / fixedWidth + 1; i++) {
-            g.drawImage(imgBackground, i * fixedWidth, 0, fixedWidth, fixedHeight, this);
-        }
+        g.drawImage(imgBackground, 0, 0, fixedWidth, fixedHeight, this);
     }
 } //BackgroundPanel class
 

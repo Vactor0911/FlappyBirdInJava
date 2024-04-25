@@ -37,10 +37,10 @@ public class Frame extends JFrame {
         bird.setSize(100, 100);
         pnlGame.add(bird);
 
-         PipeDown pipe = new PipeDown();
-         pipe.setLocation(600, -164);
-         pipe.setSize(100, 100);
-         pnlGame.add(pipe);
+        PipeDown pipe = new PipeDown();
+        pipe.setLocation(600, -164);
+        pipe.setSize(100, 100);
+        pnlGame.add(pipe);
 
         PipeUp pipe2 = new PipeUp();
         pipe2.setLocation(600, 356);
