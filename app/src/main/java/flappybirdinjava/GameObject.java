@@ -1,37 +1,54 @@
 package flappybirdinjava;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
 public abstract class GameObject extends JLabel {
-    public GameObject() {
+    private final Image image;
+    private final int IMAGE_WIDTH, IMAGE_HEIGHT;
+    protected int x;
+    protected int y;
+
+    public GameObject(Image image) {
         super();
+        this.image = image;
         setOpaque(false);
+
+        IMAGE_WIDTH = image.getWidth(null);
+        IMAGE_HEIGHT = image.getHeight(null);
     }
 
-    public abstract void update();
-}
+    public void update() {
+        float sizeMultiply = Main.getSizeMultiply();
+        setSize( (int)(IMAGE_WIDTH * sizeMultiply), (int)(IMAGE_HEIGHT * sizeMultiply) );
+    }
+
+    @Override
+    public void setLocation(int x, int y) {
+        this.x = x;
+        this.y = y;
+        int fixedX = (int)( x * Main.getSizeMultiply() );
+        int fixedY = (int)( y * Main.getSizeMultiply() );
+        super.setLocation(fixedX, fixedY);
+    }
+
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+    }
+} //GameObject class
 
 class BackgroundPanel extends JPanel {
     private Image imgBackground = new ImageIcon( Main.getPath("/sprites/background.png") ).getImage();
     private final int WIDTH = imgBackground.getWidth(null);
     private final int HEIGHT = imgBackground.getHeight(null);
 
-    private Bird bird = new Bird();
-
-    public BackgroundPanel() {
-        this.setLayout(null);
-
-        bird.setLocation(100, 100);
-        bird.setSize(100, 100);
-        add(bird);
-
-        addMouseListener( new MyMouseListener() );
-    }
-
     public void update() {
-        bird.update();
+        for ( Component k : getComponents() ) {
+            GameObject obj = (GameObject)k;
+            obj.update();
+        }
     }
 
     @Override
@@ -47,30 +64,24 @@ class BackgroundPanel extends JPanel {
             g.drawImage(imgBackground, i * fixedWidth, 0, fixedWidth, fixedHeight, this);
         }
     }
-
-    private class MyMouseListener extends MouseAdapter {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            bird.jump();
-        }
-    }
-}
+} //BackgroundPanel class
 
 
 class Bird extends GameObject {
-    private final ImageIcon image = new ImageIcon( Main.getPath("/sprites/bird_midflap.png") );
-    private final int WIDTH = image.getImage().getWidth(null);
-    private final int HEIGHT = image.getImage().getHeight(null);
+    private final static Image image = new ImageIcon( Main.getPath("/sprites/bird_midflap.png") ).getImage();
 
     private float jump = 0f;
     private final float GRAVITY = 3f;
     private final float G_FORCE = 0.5f;
 
     public Bird() {
-        setOpaque(false);
+        super(image);
     }
 
+    @Override
     public void update() {
+        super.update();
+
         if ( jump > -GRAVITY) {
             jump -= G_FORCE;
         }
@@ -78,21 +89,49 @@ class Bird extends GameObject {
             jump = -GRAVITY;
         }
 
-        float sizeMultiply = Main.getSizeMultiply();
-
-        setSize( (int)(WIDTH * sizeMultiply), (int)(HEIGHT * sizeMultiply) );
-
-        int y = Main.clamp( getY() - (int)( jump * Main.getSizeMultiply() ), 0, Main.getFrame().getBackgroundPanel().getHeight() - this.getHeight() );
-        setLocation( (int)(100 * Main.getSizeMultiply() ), y);
+        y = Main.clamp( (int)(y - jump), 0, 472 - image.getHeight(null) );
+        setLocation(x, y);
     }
 
     public void jump() {
         jump = 10;
     }
+} //Bird class
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        
-        g.drawImage(image.getImage(), 0, 0, getWidth(), getHeight(), this);
+class Pipe extends GameObject {
+    private int speed = 1;
+
+    public Pipe(Image image) {
+        super(image);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+
+        //Move
+        x -= speed;
+        setLocation(x, y);
+
+        //Remove
+        if (x <= -50) {
+            getParent().remove(this);
+        }
+    }
+} //Pipe class
+
+class PipeDown extends Pipe {
+    private final static Image image = new ImageIcon( Main.getPath("/sprites/pipe_down.png") ).getImage();
+
+    public PipeDown() {
+        super(image);
+    }
+}
+
+class PipeUp extends Pipe {
+    private final static Image image = new ImageIcon( Main.getPath("/sprites/pipe_up.png") ).getImage();
+
+    public PipeUp() {
+        super(image);
     }
 }

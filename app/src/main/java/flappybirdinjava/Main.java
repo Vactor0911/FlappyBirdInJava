@@ -18,6 +18,9 @@ public class Main {
     }
 
     public static float getSizeMultiply() {
+        if (frame == null) {
+            return 1f;
+        }
         return frame.getSizeMultiply();
     }
 
@@ -30,4 +33,4 @@ public class Main {
         }
         return number;
     }
-}
+} //Main class
