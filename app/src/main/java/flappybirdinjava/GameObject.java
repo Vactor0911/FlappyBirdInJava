@@ -3,6 +3,12 @@ package flappybirdinjava;
 import java.awt.*;
 import javax.swing.*;
 
+import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
+
+import javax.imageio.ImageIO;
+import java.awt.image.*;
+import java.io.File;
+
 public abstract class GameObject extends JLabel {
     private final Image image;
     private final int IMAGE_WIDTH, IMAGE_HEIGHT;
@@ -22,6 +28,16 @@ public abstract class GameObject extends JLabel {
         float sizeMultiply = Main.getSizeMultiply();
         setSize( (int)(IMAGE_WIDTH * sizeMultiply), (int)(IMAGE_HEIGHT * sizeMultiply) );
     }
+
+    //5주차
+    public int getImageWidth() {
+        return image.getWidth(null);
+    }
+
+    public int getImageHeight() {
+        return image.getHeight(null);
+    }
+    //
 
     @Override
     public void setLocation(int x, int y) {
@@ -97,6 +113,7 @@ class Bird extends GameObject {
 
 class Pipe extends GameObject {
     private int speed = 1;
+    public static final int MIN_HEIGHT = 50;
 
     public Pipe(Image image) {
         super(image);
@@ -123,6 +140,14 @@ class PipeDown extends Pipe {
     public PipeDown() {
         super(image);
     }
+
+    //5주차
+    @Override
+    public void setLocation(int x,  int y) {
+        int clampY = Main.clamp(y, -image.getHeight(null) + Pipe.MIN_HEIGHT, 0);
+        super.setLocation(x, clampY);
+    }
+    //
 }
 
 class PipeUp extends Pipe {
@@ -131,4 +156,31 @@ class PipeUp extends Pipe {
     public PipeUp() {
         super(image);
     }
+
+    //5주차
+    @Override
+    public void setLocation(int x,  int y) {
+        int clampY = Main.clamp(y, 472-image.getHeight(null), 472 - Pipe.MIN_HEIGHT);
+        super.setLocation(x, clampY);
+    }
+    //
 }
+
+//5주차
+class PipeSpawner {
+    public static final int SPAWN_DELAY = 2500;
+    public static final int MIN_SPAWN_HEIGHT = 100;
+    public static final int GAP = 100;
+
+    public static void spawnPipe(BackgroundPanel root, int y) {
+        PipeUp pipeUp = new PipeUp();
+        PipeDown pipeDown = new PipeDown();
+
+        pipeUp.setLocation(600, y + GAP);
+        pipeDown.setLocation(600, y - GAP - pipeDown.getImageHeight());
+
+        root.add(pipeUp);
+        root.add(pipeDown);
+    }
+}
+//

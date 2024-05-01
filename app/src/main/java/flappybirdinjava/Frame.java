@@ -37,15 +37,9 @@ public class Frame extends JFrame {
         bird.setSize(100, 100);
         pnlGame.add(bird);
 
-        PipeDown pipe = new PipeDown();
-        pipe.setLocation(600, -164);
-        pipe.setSize(100, 100);
-        pnlGame.add(pipe);
-
-        PipeUp pipe2 = new PipeUp();
-        pipe2.setLocation(600, 356);
-        pipe2.setSize(100, 100);
-        pnlGame.add(pipe2);
+        //5주차
+        PipeSpawner.spawnPipe(pnlGame, 200);
+        //
 
         add(pnlGame, "Game");
         pnlGame.addMouseListener( new MyMouseListener() );
@@ -58,6 +52,19 @@ public class Frame extends JFrame {
             }
         };
         timer.scheduleAtFixedRate(timerTask, 0, 10);
+
+        //5주차
+        Timer pipeSpawnTimer = new Timer();
+        TimerTask pipeSpawnTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                int randY = (int)(Math.random() * 472);
+                int clampY = Main.clamp(randY, PipeSpawner.MIN_SPAWN_HEIGHT + Pipe.MIN_HEIGHT, 472 - PipeSpawner.MIN_SPAWN_HEIGHT - Pipe.MIN_HEIGHT);
+                PipeSpawner.spawnPipe(pnlGame, clampY);
+            }
+        };
+        pipeSpawnTimer.scheduleAtFixedRate(pipeSpawnTimerTask, PipeSpawner.SPAWN_DELAY, PipeSpawner.SPAWN_DELAY);
+        //
     } //Constructor
 
     public float getSizeMultiply() {
