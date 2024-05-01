@@ -3,12 +3,6 @@ package flappybirdinjava;
 import java.awt.*;
 import javax.swing.*;
 
-import com.google.errorprone.annotations.OverridingMethodsMustInvokeSuper;
-
-import javax.imageio.ImageIO;
-import java.awt.image.*;
-import java.io.File;
-
 public abstract class GameObject extends JLabel {
     private final Image image;
     private final int IMAGE_WIDTH, IMAGE_HEIGHT;
