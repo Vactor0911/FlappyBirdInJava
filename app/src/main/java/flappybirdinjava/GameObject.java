@@ -137,7 +137,7 @@ class PipeDown extends Pipe {
 
     //5주차
     @Override
-    public void setLocation(int x,  int y) {
+    public void setLocation(int x, int y) {
         int clampY = Main.clamp(y, -image.getHeight(null) + Pipe.MIN_HEIGHT, 0);
         super.setLocation(x, clampY);
     }
@@ -153,8 +153,8 @@ class PipeUp extends Pipe {
 
     //5주차
     @Override
-    public void setLocation(int x,  int y) {
-        int clampY = Main.clamp(y, 472-image.getHeight(null), 472 - Pipe.MIN_HEIGHT);
+    public void setLocation(int x, int y) {
+        int clampY = Main.clamp(y, 472 - image.getHeight(null), 472 - Pipe.MIN_HEIGHT);
         super.setLocation(x, clampY);
     }
     //
@@ -163,7 +163,6 @@ class PipeUp extends Pipe {
 //5주차
 class PipeSpawner {
     public static final int SPAWN_DELAY = 2500;
-    public static final int MIN_SPAWN_HEIGHT = 100;
     public static final int GAP = 100;
 
     public static void spawnPipe(BackgroundPanel root, int y) {
@@ -171,7 +170,7 @@ class PipeSpawner {
         PipeDown pipeDown = new PipeDown();
 
         pipeUp.setLocation(600, y + GAP);
-        pipeDown.setLocation(600, y - GAP - pipeDown.getImageHeight());
+        pipeDown.setLocation( 600, y - GAP - pipeDown.getImageHeight() );
 
         root.add(pipeUp);
         root.add(pipeDown);
