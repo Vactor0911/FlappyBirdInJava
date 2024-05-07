@@ -1,6 +1,8 @@
 package flappybirdinjava;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+
 import javax.swing.*;
 
 public abstract class GameObject extends JLabel {
@@ -23,13 +25,19 @@ public abstract class GameObject extends JLabel {
         setSize( (int)(IMAGE_WIDTH * sizeMultiply), (int)(IMAGE_HEIGHT * sizeMultiply) );
     }
 
-    //5주차
     public int getImageWidth() {
         return image.getWidth(null);
     }
 
     public int getImageHeight() {
         return image.getHeight(null);
+    }
+
+    //6주차
+    public boolean isCollided(GameObject object) {
+        Rectangle rectThis = new Rectangle( getX(), getY(), getWidth(), getHeight() );
+        Rectangle rectObject = new Rectangle( object.getX(), object.getY(), object.getWidth(), object.getHeight() );
+        return rectThis.intersects(rectObject);
     }
     //
 
@@ -101,6 +109,11 @@ class Bird extends GameObject {
     }
 
     public void jump() {
+        //6주차
+        if ( Main.getFrame().isGameOver() ) {
+            return;
+        }
+        //
         jump = 10;
     }
 } //Bird class
@@ -108,9 +121,11 @@ class Bird extends GameObject {
 class Pipe extends GameObject {
     private int speed = 1;
     public static final int MIN_HEIGHT = 50;
+    private Bird bird; //6주차
 
     public Pipe(Image image) {
         super(image);
+        bird = Main.getFrame().getBird(); //6주차
     }
 
     @Override
@@ -125,47 +140,58 @@ class Pipe extends GameObject {
         if (x <= -50) {
             getParent().remove(this);
         }
+        
+        //6주차
+        //Collision
+        if ( Main.getFrame().isGameOver() || getX() + getWidth() < bird.getX() ) {
+            return;
+        }
+        if ( isCollided(bird) ) {
+            Main.getFrame().gameOver();
+        }
+        //
     }
 } //Pipe class
 
 class PipeDown extends Pipe {
-    private final static Image image = new ImageIcon( Main.getPath("/sprites/pipe_down.png") ).getImage();
+    private static final Image image = new ImageIcon( Main.getPath("/sprites/pipe_down.png") ).getImage();
 
     public PipeDown() {
         super(image);
     }
 
-    //5주차
     @Override
     public void setLocation(int x, int y) {
         int clampY = Main.clamp(y, -image.getHeight(null) + Pipe.MIN_HEIGHT, 0);
         super.setLocation(x, clampY);
     }
-    //
 }
 
 class PipeUp extends Pipe {
-    private final static Image image = new ImageIcon( Main.getPath("/sprites/pipe_up.png") ).getImage();
+    private static final Image image = new ImageIcon( Main.getPath("/sprites/pipe_up.png") ).getImage();
 
     public PipeUp() {
         super(image);
     }
 
-    //5주차
     @Override
     public void setLocation(int x, int y) {
         int clampY = Main.clamp(y, 472 - image.getHeight(null), 472 - Pipe.MIN_HEIGHT);
         super.setLocation(x, clampY);
     }
-    //
 }
 
-//5주차
 class PipeSpawner {
     public static final int SPAWN_DELAY = 2500;
     public static final int GAP = 100;
 
     public static void spawnPipe(BackgroundPanel root, int y) {
+        //6주차
+        if ( Main.getFrame().isGameOver() ) {
+            return;
+        }
+        //
+
         PipeUp pipeUp = new PipeUp();
         PipeDown pipeDown = new PipeDown();
 
@@ -176,4 +202,3 @@ class PipeSpawner {
         root.add(pipeDown);
     }
 }
-//

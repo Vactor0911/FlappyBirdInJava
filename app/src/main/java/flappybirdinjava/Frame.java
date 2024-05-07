@@ -10,6 +10,8 @@ public class Frame extends JFrame {
     private BackgroundPanel pnlGame = new BackgroundPanel();
     private Timer timer = new Timer();
     private TimerTask timerTask;
+    Timer pipeSpawnTimer; //6주차
+    TimerTask pipeSpawnTimerTask; //6주차
 
     private static Dimension scrnSize = Toolkit.getDefaultToolkit().getScreenSize();
     private static Rectangle winSize = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -21,6 +23,7 @@ public class Frame extends JFrame {
     //Variable
     private float sizeMultiply = 1.0f;
     private final int ORIGIN_SIZE = 512;
+    private boolean flagGameOver = false; //6주차
 
     public Frame() {
         //Initialize
@@ -47,11 +50,8 @@ public class Frame extends JFrame {
                 pnlGame.update();
             }
         };
-        timer.scheduleAtFixedRate(timerTask, 0, 10);
 
-        //5주차
-        Timer pipeSpawnTimer = new Timer();
-        TimerTask pipeSpawnTimerTask = new TimerTask() {
+        pipeSpawnTimerTask = new TimerTask() {
             @Override
             public void run() {
                 int randY = (int)(Math.random() * 472);
@@ -59,8 +59,14 @@ public class Frame extends JFrame {
                 PipeSpawner.spawnPipe(pnlGame, clampY);
             }
         };
-        pipeSpawnTimer.scheduleAtFixedRate(pipeSpawnTimerTask, PipeSpawner.SPAWN_DELAY, PipeSpawner.SPAWN_DELAY);
+        start();
     } //Constructor
+
+    public void start() {
+        timer.scheduleAtFixedRate(timerTask, 0, 10);
+        pipeSpawnTimer = new Timer();
+        pipeSpawnTimer.scheduleAtFixedRate(pipeSpawnTimerTask, 0, PipeSpawner.SPAWN_DELAY);
+    }
 
     public float getSizeMultiply() {
         return sizeMultiply;
@@ -69,6 +75,22 @@ public class Frame extends JFrame {
     public int getTaskBarHeight() {
         return taskBarHeight;
     }
+
+    //6주차
+    public Bird getBird() {
+        return bird;
+    }
+
+    public void gameOver() {
+        flagGameOver = true;
+        pipeSpawnTimer.cancel();
+        System.out.println("GameOver!");
+    }
+
+    public boolean isGameOver() {
+        return flagGameOver;
+    }
+    //
 
     @Override
     public void paint(Graphics g) {
