@@ -2,12 +2,12 @@ package flappybirdinjava;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-
+import java.util.stream.Stream;
 import javax.swing.*;
 
 public abstract class GameObject extends JLabel {
-    private final Image image;
-    private final int IMAGE_WIDTH, IMAGE_HEIGHT;
+    private Image image; //6주차
+    private int imageWidth, imageHeight; //6주차
     protected int x;
     protected int y;
 
@@ -16,14 +16,23 @@ public abstract class GameObject extends JLabel {
         this.image = image;
         setOpaque(false);
 
-        IMAGE_WIDTH = image.getWidth(null);
-        IMAGE_HEIGHT = image.getHeight(null);
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
     }
 
     public void update() {
         float sizeMultiply = Main.getSizeMultiply();
-        setSize( (int)(IMAGE_WIDTH * sizeMultiply), (int)(IMAGE_HEIGHT * sizeMultiply) );
+        setSize( (int)(imageWidth * sizeMultiply), (int)(imageHeight * sizeMultiply) );
     }
+
+    //6주차
+    public void setImage(Image image) {
+        this.image = image;
+        imageWidth = image.getWidth(null);
+        imageHeight = image.getHeight(null);
+        repaint();
+    }
+    //
 
     public int getImageWidth() {
         return image.getWidth(null);
@@ -122,10 +131,12 @@ class Pipe extends GameObject {
     private int speed = 1;
     public static final int MIN_HEIGHT = 50;
     private Bird bird; //6주차
+    public final String TAG;
 
-    public Pipe(Image image) {
+    public Pipe(Image image, String tag) { //6주차
         super(image);
         bird = Main.getFrame().getBird(); //6주차
+        TAG = tag; //6주차
     }
 
     @Override
@@ -147,7 +158,15 @@ class Pipe extends GameObject {
             return;
         }
         if ( isCollided(bird) ) {
-            Main.getFrame().gameOver();
+            switch(TAG) {
+                case "Pipe":
+                    Main.getFrame().gameOver();
+                    break;
+                case "ScoreAdder":
+                    Main.getFrame().addScore();
+                    getParent().remove(this);
+                    break;
+            }
         }
         //
     }
@@ -157,7 +176,7 @@ class PipeDown extends Pipe {
     private static final Image image = new ImageIcon( Main.getPath("/sprites/pipe_down.png") ).getImage();
 
     public PipeDown() {
-        super(image);
+        super(image, "Pipe"); //6주차
     }
 
     @Override
@@ -171,7 +190,7 @@ class PipeUp extends Pipe {
     private static final Image image = new ImageIcon( Main.getPath("/sprites/pipe_up.png") ).getImage();
 
     public PipeUp() {
-        super(image);
+        super(image, "Pipe"); //6주차
     }
 
     @Override
@@ -179,6 +198,20 @@ class PipeUp extends Pipe {
         int clampY = Main.clamp(y, 472 - image.getHeight(null), 472 - Pipe.MIN_HEIGHT);
         super.setLocation(x, clampY);
     }
+}
+
+//6주차
+class ScoreAdder extends Pipe {
+
+    public ScoreAdder() {
+        super(getImage(), "ScoreAdder");
+    }
+
+    public static Image getImage() {
+        BufferedImage buffImage = new BufferedImage(10, 1024, BufferedImage.TYPE_INT_ARGB);
+        return new ImageIcon(buffImage).getImage();
+    }
+    
 }
 
 class PipeSpawner {
@@ -194,11 +227,80 @@ class PipeSpawner {
 
         PipeUp pipeUp = new PipeUp();
         PipeDown pipeDown = new PipeDown();
+        ScoreAdder scoreAdder = new ScoreAdder(); //6주차
 
         pipeUp.setLocation(600, y + GAP);
         pipeDown.setLocation( 600, y - GAP - pipeDown.getImageHeight() );
+        scoreAdder.setLocation(642, y - scoreAdder.getImageHeight() / 2); //6주차
 
         root.add(pipeUp);
         root.add(pipeDown);
+        root.add(scoreAdder); //6주차
     }
 }
+
+//6주차
+class ScoreText extends GameObject {
+    private static final Image[] aryImage = {
+        new ImageIcon( Main.getPath("/sprites/0.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/1.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/2.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/3.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/4.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/5.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/6.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/7.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/8.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/9.png") ).getImage()
+    };
+    
+    private class Margin {
+        public static final int X = 3;
+        public static final int Y = 12;
+    }
+
+    private int score = 0;
+    private Image image;
+
+    public ScoreText() {
+        super(aryImage[0]);
+        updateImage();
+    }
+
+    public void addScore(int score) {
+        try {
+            this.score += score;
+            updateImage();
+        }
+        catch (Exception e) { }
+    }
+
+    public void updateImage() {
+        int[] parsedScore = Stream.of( String.valueOf(score).split("") ).mapToInt(Integer::parseInt).toArray();
+        int height = aryImage[0].getHeight(null) + Margin.Y;
+        BufferedImage newImage = new BufferedImage(512, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = newImage.createGraphics();
+
+        //Get offset for align center
+        int offset = 0;
+        for (int k : parsedScore) {
+            offset += aryImage[k].getWidth(null) + Margin.X;
+        }
+
+        //Draw numbers
+        int x = 256 - offset / 2;
+        for (int k : parsedScore) {
+            Image imgNumber = aryImage[k];
+            graphics.drawImage(imgNumber, x, Margin.Y, null);
+            x += imgNumber.getWidth(null) + Margin.X;
+        }
+        graphics.dispose();
+
+        setImage( new ImageIcon(newImage).getImage() );
+    }
+
+    public Image getImage() {
+        return image;
+    }
+} //ScoreText class
+//

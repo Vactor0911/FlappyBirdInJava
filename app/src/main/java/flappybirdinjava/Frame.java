@@ -18,7 +18,8 @@ public class Frame extends JFrame {
     private static int taskBarHeight = (int)( scrnSize.getHeight() - winSize.getHeight() );
 
     //Components
-    Bird bird = new Bird();
+    private Bird bird = new Bird();
+    private ScoreText scoreText = new ScoreText(); //6주차
 
     //Variable
     private float sizeMultiply = 1.0f;
@@ -36,6 +37,11 @@ public class Frame extends JFrame {
 
         //Game Screen
         pnlGame.setLayout(null);
+
+        scoreText.setLocation(0, 0);
+        scoreText.setSize(0, 0);
+        pnlGame.add(scoreText);
+
         bird.setLocation(100, 100);
         bird.setSize(100, 100);
         pnlGame.add(bird);
@@ -84,11 +90,14 @@ public class Frame extends JFrame {
     public void gameOver() {
         flagGameOver = true;
         pipeSpawnTimer.cancel();
-        System.out.println("GameOver!");
     }
 
     public boolean isGameOver() {
         return flagGameOver;
+    }
+
+    public void addScore() {
+        scoreText.addScore(1);
     }
     //
 
