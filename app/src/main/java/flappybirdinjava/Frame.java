@@ -38,9 +38,11 @@ public class Frame extends JFrame {
         //Game Screen
         pnlGame.setLayout(null);
 
+        //6주차
         scoreText.setLocation(0, 0);
         scoreText.setSize(0, 0);
         pnlGame.add(scoreText);
+        //
 
         bird.setLocation(100, 100);
         bird.setSize(100, 100);
@@ -56,7 +58,9 @@ public class Frame extends JFrame {
                 pnlGame.update();
             }
         };
+        timer.scheduleAtFixedRate(timerTask, 0, 10);
 
+        pipeSpawnTimer = new Timer();
         pipeSpawnTimerTask = new TimerTask() {
             @Override
             public void run() {
@@ -65,14 +69,8 @@ public class Frame extends JFrame {
                 PipeSpawner.spawnPipe(pnlGame, clampY);
             }
         };
-        start();
-    } //Constructor
-
-    public void start() {
-        timer.scheduleAtFixedRate(timerTask, 0, 10);
-        pipeSpawnTimer = new Timer();
         pipeSpawnTimer.scheduleAtFixedRate(pipeSpawnTimerTask, 0, PipeSpawner.SPAWN_DELAY);
-    }
+    } //Constructor
 
     public float getSizeMultiply() {
         return sizeMultiply;
@@ -97,7 +95,7 @@ public class Frame extends JFrame {
     }
 
     public void addScore() {
-        scoreText.addScore(1);
+        scoreText.addScore(7);
     }
     //
 
