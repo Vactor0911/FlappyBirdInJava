@@ -7,6 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
         frame = new Frame();
+        frame.initGmae(); //7주차
     }
 
     public static URL getPath(String path) {

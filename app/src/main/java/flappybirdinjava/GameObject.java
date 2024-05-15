@@ -1,13 +1,14 @@
 package flappybirdinjava;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.stream.Stream;
 import javax.swing.*;
 
 public abstract class GameObject extends JLabel {
-    private Image image; //6주차
-    private int imageWidth, imageHeight; //6주차
+    private Image image;
+    private int imageWidth, imageHeight;
     protected int x;
     protected int y;
 
@@ -25,14 +26,12 @@ public abstract class GameObject extends JLabel {
         setSize( (int)(imageWidth * sizeMultiply), (int)(imageHeight * sizeMultiply) );
     }
 
-    //6주차
     public void setImage(Image image) {
         this.image = image;
         imageWidth = image.getWidth(null);
         imageHeight = image.getHeight(null);
         repaint();
     }
-    //
 
     public int getImageWidth() {
         return image.getWidth(null);
@@ -42,13 +41,11 @@ public abstract class GameObject extends JLabel {
         return image.getHeight(null);
     }
 
-    //6주차
     public boolean isCollided(GameObject object) {
         Rectangle rectThis = new Rectangle( getX(), getY(), getWidth(), getHeight() );
         Rectangle rectObject = new Rectangle( object.getX(), object.getY(), object.getWidth(), object.getHeight() );
         return rectThis.intersects(rectObject);
     }
-    //
 
     @Override
     public void setLocation(int x, int y) {
@@ -57,6 +54,15 @@ public abstract class GameObject extends JLabel {
         int fixedX = (int)( x * Main.getSizeMultiply() );
         int fixedY = (int)( y * Main.getSizeMultiply() );
         super.setLocation(fixedX, fixedY);
+    }
+
+    @Override
+    public Point getLocation() {
+        double sizeMultiply = 1f / Main.getSizeMultiply();
+        System.out.println(sizeMultiply);
+        int fixedX = (int)( x * sizeMultiply );
+        int fixedY = (int)( y * sizeMultiply );
+        return new Point(fixedX, fixedY);
     }
 
     @Override
@@ -70,6 +76,19 @@ class BackgroundPanel extends JPanel {
     private Image imgBackground = new ImageIcon( Main.getPath("/sprites/background.png") ).getImage();
     private final int WIDTH = imgBackground.getWidth(null);
     private final int HEIGHT = imgBackground.getHeight(null);
+
+    //7주차
+    public BackgroundPanel() {
+        addMouseListener( new MyMouseAdapter() );
+    }
+
+    private class MyMouseAdapter extends MouseAdapter {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            Main.getFrame().startGame();
+        }
+    }
+    //
 
     public void update() {
         for ( Component k : getComponents() ) {
@@ -92,19 +111,45 @@ class BackgroundPanel extends JPanel {
 
 
 class Bird extends GameObject {
-    private final static Image image = new ImageIcon( Main.getPath("/sprites/bird_midflap.png") ).getImage();
+    //7주차
+    private final static Image[] aryImage = {
+        new ImageIcon( Main.getPath("/sprites/bird_downflap.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/bird_midflap.png") ).getImage(),
+        new ImageIcon( Main.getPath("/sprites/bird_upflap.png") ).getImage()
+    };
 
     private float jump = 0f;
     private final float GRAVITY = 3f;
     private final float G_FORCE = 0.5f;
+    private int imageChangeCount = 0;
+    private int imageIdx = 0; //7주차
 
     public Bird() {
-        super(image);
+        super(aryImage[0]);
     }
 
     @Override
     public void update() {
         super.update();
+
+        //7주차
+        if (Main.getFrame().isGameStart() == false) {
+            return;
+        }
+
+        //Animation
+        Image image = aryImage[imageIdx];
+        imageChangeCount++;
+        if (imageChangeCount >= 10) {
+            imageChangeCount -= 10;
+            imageIdx++;
+            if (imageIdx >= aryImage.length) {
+                imageIdx -= aryImage.length;
+            }
+            image = aryImage[imageIdx];
+            setImage(image);
+        }
+        //
 
         if ( jump > -GRAVITY) {
             jump -= G_FORCE;
@@ -115,14 +160,18 @@ class Bird extends GameObject {
 
         y = Main.clamp( (int)(y - jump), 0, 472 - image.getHeight(null) );
         setLocation(x, y);
+
+        //7주차
+        if ( y >= 472 - image.getHeight(null) ) {
+            Main.getFrame().gameOver();
+        }
+        //
     }
 
     public void jump() {
-        //6주차
         if ( Main.getFrame().isGameOver() ) {
             return;
         }
-        //
         jump = 10;
     }
 } //Bird class
@@ -130,13 +179,13 @@ class Bird extends GameObject {
 class Pipe extends GameObject {
     private int speed = 1;
     public static final int MIN_HEIGHT = 50;
-    private Bird bird; //6주차
+    private Bird bird;
     public final String TAG;
 
-    public Pipe(Image image, String tag) { //6주차
+    public Pipe(Image image, String tag) {
         super(image);
-        bird = Main.getFrame().getBird(); //6주차
-        TAG = tag; //6주차
+        bird = Main.getFrame().getBird();
+        TAG = tag;
     }
 
     @Override
@@ -144,7 +193,11 @@ class Pipe extends GameObject {
         super.update();
 
         //Move
-        x -= speed;
+        //7주차
+        if ( Main.getFrame().isGameStart() && Main.getFrame().isGameOver() == false ) {
+            x -= speed;
+        }
+        //
         setLocation(x, y);
 
         //Remove
@@ -152,7 +205,6 @@ class Pipe extends GameObject {
             getParent().remove(this);
         }
         
-        //6주차
         //Collision
         if ( Main.getFrame().isGameOver() || getX() + getWidth() < bird.getX() ) {
             return;
@@ -168,7 +220,6 @@ class Pipe extends GameObject {
                     break;
             }
         }
-        //
     }
 } //Pipe class
 
@@ -176,7 +227,7 @@ class PipeDown extends Pipe {
     private static final Image image = new ImageIcon( Main.getPath("/sprites/pipe_down.png") ).getImage();
 
     public PipeDown() {
-        super(image, "Pipe"); //6주차
+        super(image, "Pipe");
     }
 
     @Override
@@ -190,7 +241,7 @@ class PipeUp extends Pipe {
     private static final Image image = new ImageIcon( Main.getPath("/sprites/pipe_up.png") ).getImage();
 
     public PipeUp() {
-        super(image, "Pipe"); //6주차
+        super(image, "Pipe");
     }
 
     @Override
@@ -200,7 +251,6 @@ class PipeUp extends Pipe {
     }
 }
 
-//6주차
 class ScoreAdder extends Pipe {
 
     public ScoreAdder() {
@@ -213,34 +263,30 @@ class ScoreAdder extends Pipe {
     }
     
 }
-//
 
 class PipeSpawner {
     public static final int SPAWN_DELAY = 2500;
     public static final int GAP = 100;
 
     public static void spawnPipe(BackgroundPanel root, int y) {
-        //6주차
         if ( Main.getFrame().isGameOver() ) {
             return;
         }
-        //
 
         PipeUp pipeUp = new PipeUp();
         PipeDown pipeDown = new PipeDown();
-        ScoreAdder scoreAdder = new ScoreAdder(); //6주차
+        ScoreAdder scoreAdder = new ScoreAdder();
 
         pipeUp.setLocation(600, y + GAP);
         pipeDown.setLocation( 600, y - GAP - pipeDown.getImageHeight() );
-        scoreAdder.setLocation(642, y - scoreAdder.getImageHeight() / 2); //6주차
+        scoreAdder.setLocation(642, y - scoreAdder.getImageHeight() / 2);
 
         root.add(pipeUp);
         root.add(pipeDown);
-        root.add(scoreAdder); //6주차
+        root.add(scoreAdder);
     }
 }
 
-//6주차
 class ScoreText extends GameObject {
     private static final Image[] aryImage = {
         new ImageIcon( Main.getPath("/sprites/0.png") ).getImage(),
@@ -276,6 +322,12 @@ class ScoreText extends GameObject {
         catch (Exception e) { }
     }
 
+    //7주차
+    public void resetScore() {
+        score = 0;
+        updateImage();
+    }
+
     public void updateImage() {
         int[] parsedScore = Stream.of( String.valueOf(score).split("") ).mapToInt(Integer::parseInt).toArray();
         int height = aryImage[0].getHeight(null) + Margin.Y;
@@ -304,4 +356,47 @@ class ScoreText extends GameObject {
         return image;
     }
 } //ScoreText class
+
+//7주차
+class StartScreen extends GameObject {
+    private static final Image image = new ImageIcon( Main.getPath("/sprites/main.png") ).getImage();
+
+    public StartScreen() {
+        super(image);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        setLocation(x, y);
+    }
+    
+}
+
+class GameOverScreen extends GameObject {
+    private static final Image image = new ImageIcon( Main.getPath("/sprites/game_over.png") ).getImage();
+
+    public GameOverScreen() {
+        super(image);
+        setVisible(false);
+    }
+}
+
+class ResetButton extends GameObject {
+    private static final Image image = new ImageIcon( Main.getPath("/sprites/play.png") ).getImage();
+
+    public ResetButton() {
+        super(image);
+        setVisible(false);
+        addMouseListener( new MyMouseAdapter() );
+    }
+    
+    private class MyMouseAdapter extends MouseAdapter {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            Main.getFrame().resetGame();
+        }
+    }
+
+}
 //
