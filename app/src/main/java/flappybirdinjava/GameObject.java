@@ -77,19 +77,6 @@ class BackgroundPanel extends JPanel {
     private final int WIDTH = imgBackground.getWidth(null);
     private final int HEIGHT = imgBackground.getHeight(null);
 
-    //7주차
-    public BackgroundPanel() {
-        addMouseListener( new MyMouseAdapter() );
-    }
-
-    private class MyMouseAdapter extends MouseAdapter {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            Main.getFrame().startGame();
-        }
-    }
-    //
-
     public void update() {
         for ( Component k : getComponents() ) {
             GameObject obj = (GameObject)k;
@@ -358,10 +345,8 @@ class ScoreText extends GameObject {
 } //ScoreText class
 
 //7주차
-class StartScreen extends GameObject {
-    private static final Image image = new ImageIcon( Main.getPath("/sprites/main.png") ).getImage();
-
-    public StartScreen() {
+class Screen extends GameObject {
+    public Screen(Image image) {
         super(image);
     }
 
@@ -370,10 +355,18 @@ class StartScreen extends GameObject {
         super.update();
         setLocation(x, y);
     }
-    
 }
 
-class GameOverScreen extends GameObject {
+class StartScreen extends Screen {
+    private static final Image image = new ImageIcon( Main.getPath("/sprites/main.png") ).getImage();
+
+    public StartScreen() {
+        super(image);
+    }
+
+}
+
+class GameOverScreen extends Screen {
     private static final Image image = new ImageIcon( Main.getPath("/sprites/game_over.png") ).getImage();
 
     public GameOverScreen() {
@@ -382,7 +375,7 @@ class GameOverScreen extends GameObject {
     }
 }
 
-class ResetButton extends GameObject {
+class ResetButton extends Screen {
     private static final Image image = new ImageIcon( Main.getPath("/sprites/play.png") ).getImage();
 
     public ResetButton() {

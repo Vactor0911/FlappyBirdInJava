@@ -66,6 +66,10 @@ public class Frame extends JFrame {
         add(pnlGame, "Game");
         pnlGame.addMouseListener( new MyMouseListener() );
 
+        pnlGame.setFocusable(true);
+        pnlGame.requestFocus();
+        pnlGame.addKeyListener( new MyKeyAdapter() );
+
         timer = new Timer();
         timerTask = new TimerTask() {
             @Override
@@ -145,7 +149,7 @@ public class Frame extends JFrame {
             gameOverScreen.setVisible(false);
             resetButton.setVisible(false);
 
-            bird.setLocation(100, 224); //7주차
+            bird.setLocation(100, 224);
             for ( Component k : pnlGame.getComponents() ) {
                 try {
                     Pipe p = (Pipe)k;
@@ -186,8 +190,19 @@ public class Frame extends JFrame {
     private class MyMouseListener extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {
+            startGame();
             bird.jump();
         }
     }
-    
+    private class MyKeyAdapter extends KeyAdapter {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            switch ( e.getKeyCode() ) {
+                case KeyEvent.VK_SPACE:
+                    startGame();
+                    bird.jump();
+                    break;
+            }
+        }
+    }
 } //Frame class
