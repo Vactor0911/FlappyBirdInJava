@@ -19,15 +19,15 @@ public class Frame extends JFrame {
     //Components
     private Bird bird = new Bird();
     private ScoreText scoreText = new ScoreText();
-    private StartScreen startScreen = new StartScreen(); //7주차
-    private GameOverScreen gameOverScreen = new GameOverScreen(); //7주차
-    private ResetButton resetButton = new ResetButton(); //7주차
+    private StartScreen startScreen = new StartScreen();
+    private GameOverScreen gameOverScreen = new GameOverScreen();
+    private ResetButton resetButton = new ResetButton();
 
     //Variable
     private float sizeMultiply = 1.0f;
     private final int ORIGIN_SIZE = 512;
     private boolean flagGameOver = false;
-    private boolean flagGameStart = false; //7주차
+    private boolean flagGameStart = false;
 
     public Frame() {
         //Initialize
@@ -41,7 +41,6 @@ public class Frame extends JFrame {
         //Game Screen
         pnlGame.setLayout(null);
 
-        //7주차
         startScreen.setLocation(164, 123);
         startScreen.setSize(0, 0);
         pnlGame.add(startScreen);
@@ -53,13 +52,12 @@ public class Frame extends JFrame {
         resetButton.setLocation(204, 276);
         resetButton.setSize(0, 0);
         pnlGame.add(resetButton);
-        //
 
         scoreText.setLocation(0, 0);
         scoreText.setSize(0, 0);
         pnlGame.add(scoreText);
 
-        bird.setLocation(100, 224); //7주차
+        bird.setLocation(100, 224);
         bird.setSize(0, 0);
         pnlGame.add(bird);
 
@@ -78,7 +76,6 @@ public class Frame extends JFrame {
             }
         };
         timer.scheduleAtFixedRate(timerTask, 0, 10);
-        //7주차
     } //Constructor
 
     public float getSizeMultiply() {
@@ -94,18 +91,14 @@ public class Frame extends JFrame {
     }
 
     public void gameOver() {
-        //7주차
         if (flagGameOver) {
             return;
         }
-        //
         flagGameOver = true;
         pipeSpawnTimer.cancel();
 
-        //7주차
         gameOverScreen.setVisible(true);
         resetButton.setVisible(true);
-        //
     }
 
     public boolean isGameOver() {
@@ -116,7 +109,6 @@ public class Frame extends JFrame {
         scoreText.addScore(1);
     }
 
-    //7주차
     public void startGame() {
         if (flagGameStart == false) {
             flagGameStart = true;
@@ -162,14 +154,9 @@ public class Frame extends JFrame {
         }
     }
 
-    public void initGmae() {
-        pnlGame.update();
-    }
-
     public boolean isGameStart() {
         return flagGameStart;
     }
-    //
 
     @Override
     public void paint(Graphics g) {

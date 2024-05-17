@@ -57,15 +57,6 @@ public abstract class GameObject extends JLabel {
     }
 
     @Override
-    public Point getLocation() {
-        double sizeMultiply = 1f / Main.getSizeMultiply();
-        System.out.println(sizeMultiply);
-        int fixedX = (int)( x * sizeMultiply );
-        int fixedY = (int)( y * sizeMultiply );
-        return new Point(fixedX, fixedY);
-    }
-
-    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
@@ -98,7 +89,6 @@ class BackgroundPanel extends JPanel {
 
 
 class Bird extends GameObject {
-    //7주차
     private final static Image[] aryImage = {
         new ImageIcon( Main.getPath("/sprites/bird_downflap.png") ).getImage(),
         new ImageIcon( Main.getPath("/sprites/bird_midflap.png") ).getImage(),
@@ -109,7 +99,7 @@ class Bird extends GameObject {
     private final float GRAVITY = 3f;
     private final float G_FORCE = 0.5f;
     private int imageChangeCount = 0;
-    private int imageIdx = 0; //7주차
+    private int imageIdx = 0;
 
     public Bird() {
         super(aryImage[0]);
@@ -119,8 +109,8 @@ class Bird extends GameObject {
     public void update() {
         super.update();
 
-        //7주차
         if (Main.getFrame().isGameStart() == false) {
+            setLocation(x, y);
             return;
         }
 
@@ -136,7 +126,6 @@ class Bird extends GameObject {
             image = aryImage[imageIdx];
             setImage(image);
         }
-        //
 
         if ( jump > -GRAVITY) {
             jump -= G_FORCE;
@@ -148,11 +137,9 @@ class Bird extends GameObject {
         y = Main.clamp( (int)(y - jump), 0, 472 - image.getHeight(null) );
         setLocation(x, y);
 
-        //7주차
         if ( y >= 472 - image.getHeight(null) ) {
             Main.getFrame().gameOver();
         }
-        //
     }
 
     public void jump() {
@@ -180,11 +167,9 @@ class Pipe extends GameObject {
         super.update();
 
         //Move
-        //7주차
         if ( Main.getFrame().isGameStart() && Main.getFrame().isGameOver() == false ) {
             x -= speed;
         }
-        //
         setLocation(x, y);
 
         //Remove
@@ -309,7 +294,6 @@ class ScoreText extends GameObject {
         catch (Exception e) { }
     }
 
-    //7주차
     public void resetScore() {
         score = 0;
         updateImage();
@@ -344,7 +328,6 @@ class ScoreText extends GameObject {
     }
 } //ScoreText class
 
-//7주차
 class Screen extends GameObject {
     public Screen(Image image) {
         super(image);
@@ -392,4 +375,3 @@ class ResetButton extends Screen {
     }
 
 }
-//
