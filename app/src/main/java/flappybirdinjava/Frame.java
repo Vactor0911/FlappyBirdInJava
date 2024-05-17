@@ -115,8 +115,6 @@ public class Frame extends JFrame {
             flagGameOver = false;
             startScreen.setVisible(false);
 
-            scoreText.resetScore();
-
             pipeSpawnTimer = new Timer();
             TimerTask pipeSpawnTimerTask = new TimerTask() {
                 @Override
@@ -140,6 +138,7 @@ public class Frame extends JFrame {
             startScreen.setVisible(true);
             gameOverScreen.setVisible(false);
             resetButton.setVisible(false);
+            scoreText.resetScore();
 
             bird.setLocation(100, 224);
             for ( Component k : pnlGame.getComponents() ) {
